@@ -36,66 +36,64 @@ classDiagram
         +void generarReportesGlobales()
     }
 
-    class Bibliotecario {
-        -String turno
-        -String codigoEmpleado
-        +Bibliotecario()
-        +void registrarPrestamo()
-        +void registrarDevolucion()
-        +void verificarInventario()
+    class Profesor {
+        -String especialidad
+        -String codigoProfesor
+        +Profesor()
+        +void registrarNotas()
+        +void verMateriasAsignadas()
     }
 
-    class Lector {
-        -String codigoEstudiantilOColaborador
-        -String tipoLector
-        -int limitePrestamos
-        +Lector()
-        +void consultarCatalogo()
-        +void verHistorialPrestamos()
+    class Estudiante {
+        -String codigoEstudiantil
+        -String programaAcademico
+        -int semestreActual
+        +Estudiante()
+        +void consultarNotas()
+        +void verHistorialAcademico()
     }
 
     Usuario <|-- Administrador
-    Usuario <|-- Bibliotecario
-    Usuario <|-- Lector
+    Usuario <|-- Profesor
+    Usuario <|-- Estudiante
 
     %% -----------------------------------------
-    %% 2. GESTIÓN DE CATÁLOGO Y LIBROS
+    %% 2. GESTIÓN ACADÉMICA Y MATERIAS
     %% -----------------------------------------
-    class Libro {
-        #String isbn
-        #String titulo
-        #String autor
-        #String editorial
-        #int anioPublicacion
-        #int stockTotal
-        #int stockDisponible
-        +Libro()
-        +boolean verificarDisponibilidad()
-        +void actualizarStock()
+    class Materia {
+        -String codigoMateria
+        -String nombreMateria
+        -int creditos
+        -int semestre
+        +Materia()
+        +String getCodigoMateria()
+        +void setCodigoMateria(String codigoMateria)
+        +String getNombreMateria()
+        +void setNombreMateria(String nombreMateria)
+        +void imprimirInformacion()
+    }
+
+    class Matricula {
+        -String idMatricula
+        -String fechaMatricula
+        -String estado
+        +Matricula()
+        +void registrarMatricula()
+        +void cancelarMatricula()
     }
 
     %% -----------------------------------------
-    %% 3. GESTIÓN DE PRÉSTAMOS Y MULTAS
+    %% 3. GESTIÓN DE CALIFICACIONES (TRANSACCIONAL)
     %% -----------------------------------------
-    class Prestamo {
-        -String idPrestamo
-        -String fechaPrestamo
-        -String fechaDevolucionTentativa
-        -String fechaDevolucionReal
-        -String estadoPrestamo
-        +Prestamo()
-        +void calcularFechaLimite()
-        +void marcarComoDevuelto()
-    }
-
-    class Multa {
-        -String idMulta
-        -int diasRetraso
-        -double montoTotal
-        -String estadoPago
-        +Multa()
-        +double calcularMonto()
-        +void actualizarEstadoPago()
+    class Calificacion {
+        -String idCalificacion
+        -double notaParcial1
+        -double notaParcial2
+        -double notaFinal
+        -String observaciones
+        +Calificacion()
+        +double calcularPromedioFinal()
+        +boolean verificarAprobacion()
     }
 
     %% -----------------------------------------
@@ -118,17 +116,14 @@ classDiagram
         +String validarRol(Usuario usuario)
     }
 
-    class ControladorLibros {
-        +void agregarLibro(Libro libro)
-        +Libro buscarLibro(String isbn)
-        +void actualizarLibro(Libro libro)
-        +void eliminarLibro(String isbn)
+    class ControladorAcademico {
+        +void matricularMateria(Estudiante estudiante, Materia materia)
+        +void gestionarMaterias(Materia materia)
     }
 
-    class ControladorPrestamos {
-        +void registrarPrestamo(Lector lector, Libro libro)
-        +void registrarDevolucion(Prestamo prestamo)
-        +void calcularMulta(Prestamo prestamo)
+    class ControladorNotas {
+        +void registrarCalificacion(Estudiante estudiante, Materia materia, double nota)
+        +void actualizarCalificacion(Calificacion calificacion)
     }
 
     class VistaLogin {
@@ -138,25 +133,26 @@ classDiagram
 
     class VistaAdminDashboard {
         +void mostrarPanelAdmin()
-        +void desplegarReportes()
+        +void desplegarReportesGlobales()
     }
 
-    class VistaBibliotecarioDashboard {
-        +void mostrarPanelPrestamos()
-        +void actualizarTablas()
+    class VistaProfesorDashboard {
+        +void mostrarPanelNotas()
+        +void actualizarTablaEstudiantes()
     }
 
-    class VistaCatalogo {
-        +void mostrarLibros()
-        +void filtrarBusqueda()
+    class VistaEstudianteDashboard {
+        +void mostrarCalificaciones()
+        +void filtrarMaterias()
     }
 
     %% -----------------------------------------
     %% RELACIONES ENTRE CLASES
     %% -----------------------------------------
-    Lector "1" --> "*" Prestamo : realiza
-    Bibliotecario "1" --> "*" Prestamo : aprueba
-    Prestamo "*" --> "1" Libro : incluye
-    Prestamo "1" --> "0..1" Multa : genera
+    Estudiante "1" --> "*" Matricula : realiza
+    Profesor "1" --> "*" Materia : dicta
+    Matricula "*" --> "1" Materia : incluye
+    Estudiante "1" --> "*" Calificacion : posee
+    Materia "1" --> "*" Calificacion : evalua
     
     ```
